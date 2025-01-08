@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} | OptiPlus{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'products:category_products' product.category.slug %}">{{ product.category.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Product Images -->
+        <div class="col-lg-6 mb-4">
+            <div class="product-gallery">
+                <!-- Main Image -->
+                <div class="main-image-container mb-3">
+                    <img src="{{ product.main_image.url }}" 
+                         alt="{{ product.name }}" 
+                         class="img-fluid rounded shadow-sm" 
+                         id="main-product-image">
+                </div>
+
+                <!-- Thumbnail Images -->
+                <div class="thumbnails d-flex gap-2">
+                    <div class="thumbnail-item active" onclick="changeMainImage(this, '{{ product.main_image.url }}')">
+                        <img src="{{ product.main_image.url }}" 
+                             alt="{{ product.name }}" 
+                             class="img-fluid rounded">
+                    </div>
+                    {% if product.image_2 %}
+                    <div class="thumbnail-item" onclick="changeMainImage(this, '{{ product.image_2.url }}')">
+                        <img src="{{ product.image_2.url }}" 
+                             alt="{{ product.name }} - View 2" 
+                             class="img-fluid rounded">
+                    </div>
+                    {% endif %}
+                    {% if product.image_3 %}
+                    <div class="thumbnail-item" onclick="changeMainImage(this, '{{ product.image_3.url }}')">
+                        <img src="{{ product.image_3.url }}" 
+                             alt="{{ product.name }} - View 3" 
+                             class="img-fluid rounded">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="col-lg-6">
+            <div class="product-details">
+                <!-- Brand and Name -->
+                <div class="mb-4">
+                    <h6 class="text-muted mb-1">{{ product.brand.name }}</h6>
+                    <h2 class="mb-2">{{ product.name }}</h2>
+                    <div class="d-flex align-items-center gap-3">
+                        {% if product.in_stock %}
+                        <span class="badge bg-success">In Stock</span>
+                        {% else %}
+                        <span class="badge bg-danger">Out of Stock</span>
+                        {% endif %}
+                        <span class="text-muted">SKU: {{ product.sku }}</span>
+                    </div>
+                </div>
+
+                <!-- Price -->
+                <div class="pricing mb-4">
+                    {% if product.sale_price %}
+                    <div class="d-flex align-items-center gap-2">
+                        <h3 class="text-danger mb-0">KSH {{ product.sale_price|floatformat:2 }}</h3>
+                        <del class="text-muted h5 mb-0">KSH {{ product.price|floatformat:2 }}</del>
+                        <span class="badge bg-danger">
+                            {{ product.get_discount_percentage|floatformat:0 }}% OFF
+                        </span>
+                    </div>
+                    {% else %}
+                    <h3 class="mb-0">KSH {{ product.price|floatformat:2 }}</h3>
+                    {% endif %}
+                </div>
+
+                <!-- Description -->
+                <div class="description mb-4">
+                    <p>{{ product.description }}</p>
+                </div>
+
+                <!-- Specifications -->
+                <div class="specifications mb-4">
+                    <h5 class="mb-3">Specifications</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th class="bg-light">Frame Shape</th>
+                                    <td>{{ product.get_frame_shape_display }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">Frame Material</th>
+                                    <td>{{ product.get_frame_material_display }}</td>
+                                </tr>
+                                {% if product.frame_width %}
+                                <tr>
+                                    <th class="bg-light">Frame Width</th>
+                                    <td>{{ product.frame_width }}</td>
+                                </tr>
+                                {% endif %}
+                                {% if product.lens_width %}
+                                <tr>
+                                    <th class="bg-light">Lens Width</th>
+                                    <td>{{ product.lens_width }}</td>
+                                </tr>
+                                {% endif %}
+                                {% if product.bridge_width %}
+                                <tr>
+                                    <th class="bg-light">Bridge Width</th>
+                                    <td>{{ product.bridge_width }}</td>
+                                </tr>
+                                {% endif %}
+                                {% if product.temple_length %}
+                                <tr>
+                                    <th class="bg-light">Temple Length</th>
+                                    <td>{{ product.temple_length }}</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Add to Cart Form -->
+                {% if product.in_stock %}
+                <form class="mb-4" method="post" action="{% url 'cart:add_to_cart' product.id %}">
+                    {% csrf_token %}
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <div class="input-group">
+                                <button type="button" class="btn btn-outline-secondary" onclick="decrementQuantity()">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" class="form-control text-center" id="quantity" name="quantity" value="1" min="1">
+                                <button type="button" class="btn btn-outline-secondary" onclick="incrementQuantity()">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                {% endif %}
+
+                <!-- WhatsApp Enquiry Button -->
+                <a href="https://wa.me/254797342380?text=Hi, I would like to enquire about {{ product.name }} (SKU: {{ product.sku }})" 
+                   class="btn btn-success w-100 mb-4" 
+                   target="_blank">
+                    <i class="fab fa-whatsapp me-2"></i>Enquire via WhatsApp
+                </a>
+
+                <!-- Additional Info -->
+                <div class="additional-info">
+                    <div class="d-flex flex-column gap-2">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-truck text-primary me-2"></i>
+                            <span>Free shipping on orders over $100</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-undo text-primary me-2"></i>
+                            <span>30-day return policy</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-shield-alt text-primary me-2"></i>
+                            <span>Secure checkout</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    {% if related_products %}
+    <section class="mt-5">
+        <h3 class="mb-4">Related Products</h3>
+        <div class="row g-4">
+            {% for related in related_products %}
+            <div class="col-md-3">
+                <div class="card h-100 product-card">
+                    {% if related.sale_price %}
+                    <div class="badge bg-danger position-absolute top-0 end-0 m-3">SALE</div>
+                    {% endif %}
+                    <img src="{{ related.main_image.url }}" class="card-img-top" alt="{{ related.name }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ related.name }}</h5>
+                        <p class="text-muted mb-2">{{ related.brand.name }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="price-container">
+                                {% if related.sale_price %}
+                                <span class="text-muted text-decoration-line-through me-2">${{ related.price }}</span>
+                                <span class="text-danger">${{ related.sale_price }}</span>
+                                {% else %}
+                                <span>${{ related.price }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0">
+                        <a href="{% url 'products:product_detail' related.slug %}" class="btn btn-outline-primary w-100">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .product-gallery .main-image-container {
+        height: 400px;
+        overflow: hidden;
+        border-radius: 0.5rem;
+    }
+
+    .product-gallery .main-image-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .product-gallery .thumbnails .thumbnail-item {
+        width: 80px;
+        height: 80px;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: all 0.3s ease;
+    }
+
+    .product-gallery .thumbnails .thumbnail-item:hover,
+    .product-gallery .thumbnails .thumbnail-item.active {
+        opacity: 1;
+    }
+
+    .product-gallery .thumbnails .thumbnail-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .specifications th {
+        width: 150px;
+    }
+
+    .product-card {
+        transition: transform 0.3s ease;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function changeMainImage(thumbnail, imageUrl) {
+    // Update main image
+    document.getElementById('main-product-image').src = imageUrl;
+    
+    // Update active thumbnail
+    document.querySelectorAll('.thumbnail-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    thumbnail.classList.add('active');
+}
+
+function incrementQuantity() {
+    const input = document.getElementById('quantity');
+    input.value = parseInt(input.value) + 1;
+}
+
+function decrementQuantity() {
+    const input = document.getElementById('quantity');
+    if (parseInt(input.value) > 1) {
+        input.value = parseInt(input.value) - 1;
+    }
+}
+
+// Initialize tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+});
+</script>
+{% endblock %}

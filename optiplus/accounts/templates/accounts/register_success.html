@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow text-center">
+                <div class="card-body p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                    </div>
+                    <h2 class="mb-4">Registration Successful!</h2>
+                    <p class="mb-4">Thank you for creating an account with OptiPlus. You're now logged in and can start shopping!</p>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'products:product_list' %}" class="btn btn-primary btn-lg">
+                            Start Shopping
+                        </a>
+                        <a href="{% url 'core:home' %}" class="btn btn-outline-primary">
+                            Go to Homepage
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

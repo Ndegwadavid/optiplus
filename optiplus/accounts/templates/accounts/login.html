@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <h2>Welcome Back</h2>
+            <p>Log in to your account to continue</p>
+        </div>
+        
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <form method="post" class="login-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}">Email</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                <div class="error-message">
+                    {{ form.username.errors|join:", " }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password.id_for_label }}">Password</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                <div class="error-message">
+                    {{ form.password.errors|join:", " }}
+                </div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="login-button">Login</button>
+        </form>
+        
+        <div class="login-footer">
+            <p>Don't have an account? <a href="{% url 'accounts:register' %}">Register here</a></p>
+            <a href="#" class="forgot-password">Forgot your password?</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-image: url("{% static 'images/hero-3.jpeg' %}");
+        background-size: cover;
+        background-position: center;
+        padding: 2rem;
+        box-sizing: border-box;
+    }
+
+    .login-card {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 16px;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 2rem;
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .login-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .login-header h2 {
+        color: #fff;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .login-header p {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1rem;
+    }
+
+    .login-form {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        background: rgba(255, 255, 255, 0.2);
+        color: #fff;
+    }
+
+    .form-group input::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .form-group input:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .error-message {
+        color: #ff6b6b;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .login-button {
+        background: rgba(255, 255, 255, 0.2);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .login-button:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .login-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+
+    .login-footer p {
+        margin-bottom: 0.5rem;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .login-footer a {
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .login-footer a:hover {
+        text-decoration: underline;
+    }
+
+    .forgot-password {
+        font-size: 0.875rem;
+    }
+
+    @media (max-width: 480px) {
+        .login-card {
+            padding: 1.5rem;
+        }
+
+        .login-header h2 {
+            font-size: 1.75rem;
+        }
+
+        .form-group input,
+        .login-button {
+            padding: 0.6rem;
+        }
+    }
+</style>
+{% endblock %}

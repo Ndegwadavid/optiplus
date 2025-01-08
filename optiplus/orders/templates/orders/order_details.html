@@ -1,0 +1,92 @@
+<!-- templates/orders/order_detail.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Order Details -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-transparent">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Order #{{ order.id }}</h5>
+                        <span class="badge {% if order.status == 'delivered' %}bg-success
+                                          {% elif order.status == 'processing' %}bg-primary
+                                          {% elif order.status == 'shipped' %}bg-info
+                                          {% elif order.status == 'cancelled' %}bg-danger
+                                          {% else %}bg-warning{% endif %}">
+                            {{ order.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Order Items -->
+                    {% for item in order.items.all %}
+                    <div class="row align-items-center mb-3">
+                        <div class="col-md-2">
+                            {% if item.product.main_image %}
+                            <img src="{{ item.product.main_image.url }}" 
+                                 alt="{{ item.product_name }}" 
+                                 class="img-fluid rounded">
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="mb-1">{{ item.product_name }}</h6>
+                            <p class="text-muted mb-0">Quantity: {{ item.quantity }}</p>
+                        </div>
+                        <div class="col-md-3 text-end">
+                            <span>${{ item.price }}</span>
+                        </div>
+                    </div>
+                    {% if not forloop.last %}
+                    <hr>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Order Summary -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Items Total</span>
+                        <span>KSH {{ order.total_amount|floatformat:2 }}</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-0">
+                        <strong>Total</strong>
+                        <strong>${{ order.total_amount }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipping Details -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">Shipping Details</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>{{ order.first_name }} {{ order.last_name }}</strong></p>
+                    <p class="mb-1">{{ order.address }}</p>
+                    <p class="mb-1">{{ order.city }}, {{ order.postal_code }}</p>
+                    <p class="mb-1">{{ order.phone }}</p>
+                    <p class="mb-0">{{ order.email }}</p>
+                    
+                    {% if order.tracking_number %}
+                    <hr>
+                    <p class="mb-0">
+                        <strong>Tracking Number:</strong><br>
+                        {{ order.tracking_number }}
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
